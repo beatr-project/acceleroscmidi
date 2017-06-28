@@ -40,6 +40,7 @@ middleware.on('visibilityEvent', function(tiraid) {
       var accelerationZ = serviceData.minew.accelerationZ;
 
       outputMidiMessage(id, accelerationX, accelerationY, accelerationZ);
+      outputOscMessage(id, accelerationX, accelerationY, accelerationZ);
     }
   }
 });

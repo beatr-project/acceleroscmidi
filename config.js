@@ -6,7 +6,7 @@ const MIDI_PORT = 0;
 const OSC_LOCAL_ADDRESS = '127.0.0.1';
 const OSC_LOCAL_PORT = 57121;
 const OSC_TARGET_ADDRESS = '127.0.0.1';
-const OSC_TARGET_PORT = 57121;
+const OSC_TARGET_PORT = 57122;
 const OSC_TARGET_ROUTE = '/acceleration';
 
 module.exports.MIDI_PORT = MIDI_PORT;
