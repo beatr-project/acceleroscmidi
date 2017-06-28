@@ -77,6 +77,6 @@ function outputMidiMessage(id, accelerationX, accelerationY, accelerationZ) {
  */
 function outputOscMessage(id, accelerationX, accelerationY, accelerationZ) {
   var args = [ id, accelerationX, accelerationY, accelerationZ ];
-  var message = { address: OSC_TARGET_ROUTE, args: args };
+  var message = { address: config.OSC_TARGET_ROUTE, args: args };
   udpPort.send(message, config.OSC_TARGET_ADDRESS, config.OSC_TARGET_PORT);
 }
