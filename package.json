@@ -18,7 +18,7 @@
     "url": "https://github.com/beatr-project/acceleroscmidi.git"
   },
   "dependencies": {
-    "barnowl": ">=0.4.21",
+    "barnowl": ">=0.4.23",
     "serialport": ">=4.0.0",
     "midi": ">=0.9.5",
     "osc": ">=2.2.0",
