@@ -21,7 +21,7 @@ var midiOut = new midi.output();
 
 // MIDI initialisation
 listMidiPorts();
-midiOut.openPort(config.MIDI_PORT);
+//midiOut.openPort(config.MIDI_PORT);
 
 // OSC initialisation
 udpPort = new osc.UDPPort( { localAddress: config.OSC_LOCAL_ADDRESS,
