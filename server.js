@@ -5,11 +5,17 @@
 const barnowl = require('barnowl');
 const midi = require('midi');
 const osc = require('osc');
+const http = require('http');
+const express = require('express');
+const socketio = require('socket.io');
 const config = require('./config');
 
 const STATUS_CONTROL_CHANGE = 0xb0;
 const CONTROL_NUMBER = 0x01;  // Modulation
 
+const app = express();
+var server = http.createServer(app);
+var io = require('socket.io')(server);
 var middleware = new barnowl();
 var midiOut = new midi.output();
 
@@ -21,6 +27,20 @@ midiOut.openPort(config.MIDI_PORT);
 udpPort = new osc.UDPPort( { localAddress: config.OSC_LOCAL_ADDRESS,
                              localPort: config.OSC_LOCAL_PORT } );
 udpPort.open();
+
+// Express web server initialisation
+app.use(express.static('web'));
+server.listen(config.HTTP_PORT, function () {
+  console.log('Browse to localhost:' + config.HTTP_PORT + ' for the web demo');
+});
+
+// Socket.io initialisation
+io.on('connection', function(client) {
+  console.log('socket.io client connected');
+  client.on('disconnect', function() {
+    console.log('socket.io client disconnected');
+  });
+});
 
 // Bluetooth initialisation
 middleware.bind( { protocol: 'serial', path: 'auto' } );
@@ -41,6 +61,7 @@ middleware.on('visibilityEvent', function(tiraid) {
 
       outputMidiMessage(id, accelerationX, accelerationY, accelerationZ);
       outputOscMessage(id, accelerationX, accelerationY, accelerationZ);
+      outputWebsocketMessage();
     }
   }
 });
@@ -79,4 +100,14 @@ function outputOscMessage(id, accelerationX, accelerationY, accelerationZ) {
   var args = [ id, accelerationX, accelerationY, accelerationZ ];
   var message = { address: config.OSC_TARGET_ROUTE, args: args };
   udpPort.send(message, config.OSC_TARGET_ADDRESS, config.OSC_TARGET_PORT);
+}
+
+
+/**
+ * Output a websocket message for the given accelerometer data.
+ */
+function outputWebsocketMessage(id, accelerationX, accelerationY,
+                                accelerationZ) {
+  var message = {};
+  io.emit('accelerometer', message);
 }
