@@ -55,16 +55,31 @@ middleware.on('visibilityEvent', function(tiraid) {
 
     if(isAccelerometer) {
       var id = tiraid.identifier.value;
-      var accelerationX = serviceData.minew.accelerationX;
-      var accelerationY = serviceData.minew.accelerationY;
-      var accelerationZ = serviceData.minew.accelerationZ;
+      var data = calculateAcceleration(serviceData.minew.accelerationX,
+                                       serviceData.minew.accelerationY,
+                                       serviceData.minew.accelerationZ);
 
-      outputMidiMessage(id, accelerationX, accelerationY, accelerationZ);
-      outputOscMessage(id, accelerationX, accelerationY, accelerationZ);
-      outputWebsocketMessage();
+      outputMidiMessage(id, data);
+      outputOscMessage(id, data);
+      outputWebsocketMessage(id, data);
     }
   }
 });
+
+
+/**
+ * Print to the console all the available MIDI ports.
+ */
+function calculateAcceleration(accelerationX, accelerationY, accelerationZ) {
+  var data = {};
+  data.accX = accelerationX.toFixed(3);
+  data.accY = accelerationY.toFixed(3);
+  data.accZ = accelerationZ.toFixed(3);
+  data.angX = ((Math.acos(accelerationX) * 2 / Math.PI) - 1).toFixed(3);
+  data.angY = ((Math.acos(accelerationY) * 2 / Math.PI) - 1).toFixed(3);
+  data.angZ = ((Math.acos(accelerationZ) * 2 / Math.PI) - 1).toFixed(3);
+  return data;
+}
 
 
 /**
@@ -85,10 +100,10 @@ function listMidiPorts() {
 /**
  * Output a MIDI message for the given accelerometer data.
  */
-function outputMidiMessage(id, accelerationX, accelerationY, accelerationZ) {
+function outputMidiMessage(id, data) {
   var status = STATUS_CONTROL_CHANGE; // + channel
   var data1 = CONTROL_NUMBER;         // Number
-  var data2 = ((Math.round(accelerationX * 32) + 64) % 127);  // Value
+  var data2 = ((Math.round(data.accX * 32) + 64) % 127);  // Value
   midiOut.sendMessage( [ status, data1, data2 ] );
 }
 
@@ -96,8 +111,8 @@ function outputMidiMessage(id, accelerationX, accelerationY, accelerationZ) {
 /**
  * Output an OSC message for the given accelerometer data.
  */
-function outputOscMessage(id, accelerationX, accelerationY, accelerationZ) {
-  var args = [ id, accelerationX, accelerationY, accelerationZ ];
+function outputOscMessage(id, data) {
+  var args = [ id, data.accX, data.accY, data.accZ ];
   var message = { address: config.OSC_TARGET_ROUTE, args: args };
   udpPort.send(message, config.OSC_TARGET_ADDRESS, config.OSC_TARGET_PORT);
 }
@@ -106,8 +121,7 @@ function outputOscMessage(id, accelerationX, accelerationY, accelerationZ) {
 /**
  * Output a websocket message for the given accelerometer data.
  */
-function outputWebsocketMessage(id, accelerationX, accelerationY,
-                                accelerationZ) {
-  var message = {};
-  io.emit('accelerometer', message);
+function outputWebsocketMessage(id, data) {
+  data.id = id;
+  io.emit('accelerometer', data);
 }

@@ -11,5 +11,7 @@ angular.module('acceleroscmidi', [ 'ui.bootstrap' ])
     var socket = io.connect(url);
 
     socket.on('accelerometer', function(accelerometer) {
+      $scope.accelerometer = accelerometer;
+      $scope.$apply();
     });
   });
