@@ -11,13 +11,15 @@ angular.module('acceleroscmidi', [ 'ui.bootstrap' ])
     var socket = io.connect(url);
 
     var pan = new Tone.Panner(0).toMaster();
-    var effect = new Tone.Chorus(60, 2.5, 0.1).connect(pan);
-    var synth = new Tone.AMOscillator("C3", "sine", "sine").connect(effect).start();
+    var effect = new Tone.Freeverb().connect(pan);
+    var player = new Tone.Player("../audio/water_loopable.wav").connect(effect);
+    player.autostart = true;
+    player.loop = true;
 
     socket.on('accelerometer', function(accelerometer) {
       $scope.accelerometer = accelerometer;
       pan.pan.value = accelerometer.angX;
-      effect.frequency.value = (accelerometer.angY + 1) * 4;
+      effect.roomSize.value = (accelerometer.angY + 1) / 2;
       $scope.$apply();
     });
   });
