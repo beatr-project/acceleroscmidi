@@ -21,7 +21,9 @@ var midiOut = new midi.output();
 
 // MIDI initialisation
 listMidiPorts();
-//midiOut.openPort(config.MIDI_PORT);
+if(config.MIDI_PORT >= 0) {
+  midiOut.openPort(config.MIDI_PORT);
+}
 
 // OSC initialisation
 udpPort = new osc.UDPPort( { localAddress: config.OSC_LOCAL_ADDRESS,
@@ -43,7 +45,7 @@ io.on('connection', function(client) {
 });
 
 // Bluetooth initialisation
-middleware.bind( { protocol: 'serial', path: 'auto' } );
+middleware.bind(config.BARNOWL_SOURCE);
 middleware.on('visibilityEvent', function(tiraid) {
   var hasData = (tiraid.identifier.hasOwnProperty('advData') &&
                  tiraid.identifier.advData.hasOwnProperty('serviceData'));
